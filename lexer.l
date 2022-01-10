@@ -41,6 +41,7 @@ void yyerror(const char *);
 (right)/[^a-zA-Z0-9_ ]		  {return RIGHT;}
 (lms)/[^a-zA-Z0-9_ ]		  {return LMS;}
 (function)/[^a-zA-Z0-9_ ]	  {return FUNC;}
+(print)/[^a-zA-Z0-9_ ]        {return PRINT;}
 (return)/[^a-zA-Z0-9_ ]		  {return RETURN;}
 (work)/[^a-zA-Z0-9_ ]		  {return WORK;}
 [\[\]\|\{\},\(\);\n]          {return *yytext;}

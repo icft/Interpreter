@@ -15,10 +15,11 @@ public:
     MemoryUnit(MemoryUnit&& m) : data(std::move(m.data)) {}
     MemoryUnit set(const MemoryUnit& m) {
         data = m.data;
+        return *this;
     }
     MemoryUnit add(const MemoryUnit& m) {
-        MemoryUnit res;
         try {
+            MemoryUnit res;
             if (data->get_type() == Datatypes::SHORT && m.data->get_type() == Datatypes::SHORT) {
                 auto s1 = std::dynamic_pointer_cast<Short>(data);
                 auto s2 = std::dynamic_pointer_cast<Short>(m.data);
@@ -119,16 +120,15 @@ public:
                     }
                 }
             }
+            return res;
         }
         catch (const std::exception& ex) {
             throw ex;
         }
-        //res.data = std::make_shared<Int>((int)(*data)+(int)(*m.data));
-        return res;
     }
     MemoryUnit sub(const MemoryUnit& m) {
-        MemoryUnit res;
         try {
+            MemoryUnit res;
             if (data->get_type() == Datatypes::SHORT && m.data->get_type() == Datatypes::SHORT) {
                 auto s1 = std::dynamic_pointer_cast<Short>(data);
                 auto s2 = std::dynamic_pointer_cast<Short>(m.data);
@@ -229,12 +229,11 @@ public:
                     }
                 }
             }
+            return res;
         }
         catch (const std::exception& ex) {
             throw ex;
         }
-        //res.data = std::make_shared<Int>((int)(*data) - (int)(*m.data));
-        return res;
     }
     MemoryUnit logic_and(const MemoryUnit& m) {
         MemoryUnit res;

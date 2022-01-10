@@ -6,6 +6,7 @@
 #include <memory>
 #include <vector>
 
+extern FILE* yyin;
 std::shared_ptr<Node>* root;
 extern int yylineno;
 int yylex();
@@ -37,7 +38,7 @@ std::pair<Datatypes, std::vector<VarDeclaration>>* vd_list;
 %left OR
 %left NAND
 %left NOR
-%token MOVE LEFT RIGHT
+%token MOVE LEFT RIGHT PRINT
 %token SET
 %token LMS OF
 %token FUNC RETURN
@@ -47,6 +48,7 @@ std::pair<Datatypes, std::vector<VarDeclaration>>* vd_list;
 %nonassoc '{' '}' '[' ']' '(' ')'
 
 %type <Node_> program
+%type <Node_> maindecl
 %type <Node_> stmt_list
 %type <Node_> stmt
 //%type <Node_> fcall
@@ -67,7 +69,11 @@ std::pair<Datatypes, std::vector<VarDeclaration>>* vd_list;
 
 %%
 program:
-    FUNC WORK '(' ')' stmt RETURN '1' ';'                   {init_memory(*$5); exec(*$5, (*$5)->local);}
+    maindecl                                                {}
+	;
+
+maindecl:
+    FUNC WORK '(' ')' stmt                                 {init_memory(*$5); exec(*$5, (*$5)->local);}
 	;
 
 stmt_list:
@@ -87,6 +93,7 @@ stmt:
 	| IF expr THEN stmt %prec IFX						    {$$=new std::shared_ptr<Node>(); *$$=std::make_shared<IfNode>(yylineno, *$2, *$4);}
 	| IF expr THEN stmt ELSE stmt						    {$$=new std::shared_ptr<Node>(); *$$=std::make_shared<IfNode>(yylineno, *$2, *$4, *$6);}
 	| FUNC NAME argslist BEGIN_ stmt_list END RETURN expr ';' 	{$$=new std::shared_ptr<Node>(); *$$=std::make_shared<FDeclNode>(yylineno, *$2, *$5, *$3, *$8);}
+	| PRINT expr ';'                                        {$$=new std::shared_ptr<Node>(); *$$=std::make_shared<PrintNode>(yylineno, *$2);}
 	;
 
 argslist:
@@ -188,11 +195,17 @@ directions:
 	;
 %%
 
-void yyerror(const char* c) {
-    std::string str;
-    str = c;
-    std::cout << str << std::endl;
+
+
+void yyerror (char const *s) {
+  fprintf(stderr, "%s\n", s);
 }
 
 
-int main() {}
+
+int main() {
+    yyin = fopen("code.txt", "r");
+    yyparse();
+    fclose(yyin);
+    return 0;
+}

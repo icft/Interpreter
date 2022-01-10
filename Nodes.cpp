@@ -844,6 +844,42 @@ std::shared_ptr<MemoryUnit> exec(std::shared_ptr<Node> u, std::shared_ptr<Memory
                 return std::make_shared<MemoryUnit>(std::make_shared<Bool>(UNDEFINED));
             }
         }
+        case NodeType::PRINTNODE: {
+            auto d = exec(std::dynamic_pointer_cast<PrintNode>(u)->next, m)->data;
+            if (d->get_type() == Datatypes::INT) {
+                std::cout << std::dynamic_pointer_cast<Int>(d)->value << std::endl;
+            } else if (d->get_type() == Datatypes::SHORT) {
+                std::cout << std::dynamic_pointer_cast<Short>(d)->value << std::endl;
+            } else if (d->get_type() == Datatypes::BOOL) {
+                auto v = std::dynamic_pointer_cast<Bool>(d)->value;
+                if (v == Logic::TRUE) {
+                    std::cout << "true" << std::endl;
+                } else if (v == Logic::FALSE) {
+                    std::cout << "false" << std::endl;
+                } else {
+                    std::cout << "undefined" << std::endl;
+                }
+            } else {
+                auto v = std::dynamic_pointer_cast<Vector>(d);
+                for (int i = 0; i < v->count; i++) {
+                    if (v->vec[i]->get_type() == Datatypes::INT) {
+                        std::cout << std::dynamic_pointer_cast<Int>(v->vec[i])->value << std::endl;
+                    } else if (v->vec[i]->get_type() == Datatypes::SHORT) {
+                        std::cout << std::dynamic_pointer_cast<Short>(v->vec[i])->value << std::endl;
+                    } else if (v->vec[i]->get_type() == Datatypes::BOOL) {
+                        auto b = std::dynamic_pointer_cast<Bool>(v->vec[i])->value;
+                        if (b == Logic::TRUE) {
+                            std::cout << "true" << std::endl;
+                        } else if (b == Logic::FALSE) {
+                            std::cout << "false" << std::endl;
+                        } else {
+                            std::cout << "undefined" << std::endl;
+                        }
+                    }
+                }
+            }
+            return nullptr;
+        }
         default:
             break;
     }

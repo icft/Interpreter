@@ -11,7 +11,7 @@
 enum NodeType {VARLEAF, INTLEAF, SHORTLEAF, BOOLLEAF, ADDNODE, SUBNODE, ANDNODE, NANDNODE,
         ORNODE, NORNODE, SMALLERNODE, LARGERNODE, SETNODE, LOOPNODE, FDECLNODE,
         SIZEOFNODE, IFNODE, FCALLNODE, VECDECLNODE, INDEXNODE, VARDECLNODE, STATEMENT, VARLIST,
-        RIGHTNODE, LEFTNODE, MOVENODE, LMSNODE};
+        RIGHTNODE, LEFTNODE, MOVENODE, LMSNODE, PRINTNODE};
 
 class Node {
 public:
@@ -609,6 +609,22 @@ public:
     ~LmsNode() = default;
 };
 
+
+class PrintNode : public Node {
+public:
+    std::shared_ptr<Node> next;
+    NodeType type = NodeType::PRINTNODE;
+    
+    PrintNode(int line, std::shared_ptr<Node> n) {
+        line_number = line;
+        if (!n) {
+            throw SyntaxError("Print must have one parameter");
+        } else {
+            next = n;
+        }
+    }
+    ~PrintNode() = default;
+};
 // std::shared_ptr<MemoryUnit> exec(std::shared_ptr<Node> u, std::shared_ptr<Memory> m);
 // 
 // enum NodeType {VARLEAF, INTLEAF, SHORTLEAF, BOOLLEAF, ADDNODE, SUBNODE, ANDNODE, NANDNODE,

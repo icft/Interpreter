@@ -11,7 +11,7 @@ public:
     std::string msg;
 
     Exception(std::string s) : msg(s) {}
-    virtual std::string what() {std::cout << msg << std::endl;}
+    virtual std::string what() {return msg;}
     virtual ~Exception() = default;
 };
 
