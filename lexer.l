@@ -11,43 +11,43 @@ void yyerror(const char *);
 
 %%
 [1-9][0-9]*			          {yylval.ival=atoi(yytext); return INTVAL;}
-(true)/[^a-zA-Z0-9_ ]		  {yylval.bval=TRUE; return TRUE_;}
-(false)/[^a-zA-Z0-9_ ]		  {yylval.bval=FALSE; return FALSE_;}
-(undefined)/[^a-zA-Z0-9_] 	  {yylval.bval=UNDEFINED; return UNDEFINED_;}
-(int)/[^a-zA-Z0-9_ ]		  {yylval.types_=INT; return INT_;}
-(Sint)/[^a-zA-Z0-9_ ]		  {yylval.types_=SHORT; return SHORT_;}
-(bool)/[^a-zA-Z0-9_ ]		  {yylval.types_=BOOL; return BOOL_;}
-(vector)/[^a-zA-Z0-9_ ]		  {yylval.types_=VECTOR; return VECTOR_;}
-(of)/[^a-zA-Z0-9_ ] 		  {return OF;}
-(sizeof)/[^a-zA-Z0-9_ ]		  {return SIZEOF;}
-(set)/[^a-zA-Z0-9_ ]		  {return SET;}
-(add)/[^a-zA-Z0-9_ ]		  {return ADD;}
-(sub)/[^a-zA-Z0-9_ ]		  {return SUB;}
-(smaller)/[^a-zA-Z0-9_ ]	  {return SMALLER;}
-(larger)/[^a-zA-Z0-9_ ]		  {return LARGER;}
-(not[ \t]*or)/[^a-zA-Z0-9_ ]  {return NOR;}
-(or)/[^a-zA-Z0-9_ ]		      {return OR;}
-(not[ \t]*and)/[^a-zA-Z0-9_ ] {return NAND;}
-(and)/[^a-zA-Z0-9_ ]		  {return AND;}
-(begin)/[^a-zA-Z0-9_ ]		  {return BEGIN_;}
-(end)/[^a-zA-Z0-9_ ]		  {return END;}
-(do)/[^a-zA-Z0-9_ ]		      {return DO;}
-(while)/[^a-zA-Z0-9_ ]		  {return WHILE;}
-(if)/[^a-zA-Z0-9_ ]		      {return IF;}
-(then)/[^a-zA-Z0-9_ ]		  {return THEN;}
-(else)/[^a-zA-Z0-9_ ]		  {return ELSE;}
-(move)/[^a-zA-Z0-9_ ]		  {return MOVE;}
-(left)/[^a-zA-Z0-9_ ]		  {return LEFT;}
-(right)/[^a-zA-Z0-9_ ]		  {return RIGHT;}
-(lms)/[^a-zA-Z0-9_ ]		  {return LMS;}
-(function)/[^a-zA-Z0-9_ ]	  {return FUNC;}
-(print)/[^a-zA-Z0-9_ ]        {return PRINT;}
-(return)/[^a-zA-Z0-9_ ]		  {return RETURN;}
-(work)/[^a-zA-Z0-9_ ]		  {return WORK;}
-[\[\]\|\{\},\(\);\n]          {return *yytext;}
+(true)		                  {yylval.bval=TRUE; return TRUE_;}
+(false)		                  {yylval.bval=FALSE; return FALSE_;}
+(undefined)                   {yylval.bval=UNDEFINED; return UNDEFINED_;}
+(int)		                  {yylval.types_=INT; return INT_;}
+(Sint)	                      {yylval.types_=SHORT; return SHORT_;}
+(bool)	                      {yylval.types_=BOOL; return BOOL_;}
+(vector)	                  {yylval.types_=VECTOR; return VECTOR_;}
+(of)	                      {return OF;}
+(sizeof)	                  {return SIZEOF;}
+(set)                         {return SET;}
+(add)		                  {return ADD;}
+(sub)		                  {return SUB;}
+(smaller)                     {return SMALLER;}
+(larger)		              {return LARGER;}
+(not[ \t]*or)                 {return NOR;}
+(or)	                      {return OR;}
+(not[ \t]*and)                {return NAND;}
+(and)		                  {return AND;}
+(begin)		                  {return BEGIN_;}
+(end)		                  {return END;}
+(do)		                  {return DO;}
+(while)		                  {return WHILE;}
+(if)		                  {return IF;}
+(then)		                  {return THEN;}
+(else)		                  {return ELSE;}
+(move)		                  {return MOVE;}
+(left)		                  {return LEFT;}
+(right)		                  {return RIGHT;}
+(lms)	                      {return LMS;}
+(function)	                  {return FUNC;}
+(print)                       {return PRINT;}
+(return)		              {return RETURN;}
+(work)		                  {return WORK;}
 [a-zA-Z_][a-zA-Z_0-9]*        {yylval.s_name=new std::string(yytext); return NAME;}
 
-[\t ]				          {};
+[\[\]\|\{\},\(\);\n]          {return *yytext;}
+[ \t\r\n]+				      ;
 .				              {yyerror(yytext);}
 
 %%
