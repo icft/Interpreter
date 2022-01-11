@@ -43,10 +43,9 @@ void yyerror(const char *);
 (function)	                  {return FUNC;}
 (print)                       {return PRINT;}
 (return)		              {return RETURN;}
-(work)		                  {return WORK;}
 [a-zA-Z_][a-zA-Z_0-9]*        {yylval.s_name=new std::string(yytext); return NAME;}
 
-[\[\]\|\{\},\(\);\n]          {return *yytext;}
+[\[\]\|\{\},\(\);]            {return *yytext;}
 [ \t\r\n]+				      ;
 .				              {yyerror(yytext);}
 
