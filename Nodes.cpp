@@ -5,11 +5,436 @@ typedef struct {
     int y;
 } coordinates;
 
+std::vector<std::shared_ptr<FunctionUnit>> functions;
+std::vector<std::exception> errors;
+
 std::vector<std::vector<std::string>> labirint; //0-тупик, 1-текущее, 2-пустота, 3-выходы
 coordinates cur_coordinates;
 int radius;
 
+VarLeaf::VarLeaf(int line, const std::string &s) {
+    line_number = line;
+    name = s;
+}
 
+NodeType VarLeaf::get_type() {
+    return type;
+}
+
+IntLeaf::IntLeaf(int line, std::int32_t value) {
+    data = std::make_shared<MemoryUnit>(std::make_shared<Int>(value));
+    line_number = line;
+}
+
+IntLeaf::IntLeaf(MemoryUnit m) {
+    data = std::make_shared<MemoryUnit>(m);
+}
+
+NodeType IntLeaf::get_type() {
+    return type;
+}
+
+ShortLeaf::ShortLeaf(MemoryUnit m) {
+    data = std::make_shared<MemoryUnit>(m);
+}
+
+ShortLeaf::ShortLeaf(int line, std::int16_t value) {
+    data = std::make_shared<MemoryUnit>(std::make_shared<Short>(value));
+    line_number = line;
+}
+
+NodeType ShortLeaf::get_type() {
+    return type;
+}
+
+BoolLeaf::BoolLeaf(MemoryUnit m) {
+    data = std::make_shared<MemoryUnit>(m);
+}
+
+BoolLeaf::BoolLeaf(int line, Logic value) {
+    data = std::make_shared<MemoryUnit>(std::make_shared<Bool>(value));
+    line_number = line;
+}
+
+NodeType BoolLeaf::get_type() {
+    return type;
+}
+
+AddNode::AddNode(int line, const std::shared_ptr<Node> &l, const std::shared_ptr<Node> &r) {
+    if (l && r) {
+        line_number = line;
+        left = l;
+        right = r;
+    }
+    else {
+        errors.push_back(SyntaxError("Add must have 2 parameters"));
+    }
+}
+
+NodeType AddNode::get_type() {
+    return type;
+}
+
+SubNode::SubNode(int line, const std::shared_ptr<Node> &l, const std::shared_ptr<Node> &r) {
+    if (l && r) {
+        line_number = line;
+        left = l;
+        right = r;
+    }
+    else {
+        errors.push_back(SyntaxError("Sub must have 2 parameters"));
+    }
+}
+
+NodeType SubNode::get_type() {
+    return type;
+}
+
+AndNode::AndNode(int line, const std::shared_ptr<Node> &l, const std::shared_ptr<Node> &r) {
+    if (l && r) {
+        line_number = line;
+        left = l;
+        right = r;
+    }
+    else {
+        errors.push_back(SyntaxError("And must have 2 parameters"));
+    }
+}
+
+NodeType AndNode::get_type() {
+    return type;
+}
+
+NandNode::NandNode(int line, const std::shared_ptr<Node> &l, const std::shared_ptr<Node> &r) {
+    if (l && r) {
+        line_number = line;
+        left = l;
+        right = r;
+    }
+    else {
+        errors.push_back(SyntaxError("Nand must have 2 parameters"));
+    }
+}
+
+NodeType NandNode::get_type() {
+    return type;
+}
+
+OrNode::OrNode(int line, const std::shared_ptr<Node> &l, const std::shared_ptr<Node> &r) {
+    if (l && r) {
+        left = l;
+        right = r;
+    }
+    else {
+        errors.push_back(SyntaxError("Or must have 2 parameters"));
+    }
+}
+
+NodeType OrNode::get_type() {
+    return type;
+}
+
+NorNode::NorNode(int line, const std::shared_ptr<Node> &l, const std::shared_ptr<Node> &r) {
+    if (l && r) {
+        line_number = line;
+        left = l;
+        right = r;
+    }
+    else {
+        errors.push_back(SyntaxError("Nor must have 2 parameters"));
+    }
+}
+
+NodeType NorNode::get_type() {
+    return type;
+}
+
+SmallerNode::SmallerNode(int line, const std::shared_ptr<Node> &l, const std::shared_ptr<Node> &r) {
+    if (l && r) {
+        line_number = line;
+        left = l;
+        right = r;
+    }
+    else {
+        errors.push_back(SyntaxError("Smaller must have 2 parameters"));
+    }
+}
+
+NodeType SmallerNode::get_type() {
+    return type;
+}
+
+LargerNode::LargerNode(int line, const std::shared_ptr<Node> &l, const std::shared_ptr<Node> &r) {
+    if (l && r) {
+        line_number = line;
+        left = l;
+        right = r;
+    }
+    else {
+        errors.push_back(SyntaxError("Larger must have 2 parameters"));
+    }
+}
+
+NodeType LargerNode::get_type() {
+    return type;
+}
+
+SetNode::SetNode(int line, const std::shared_ptr<Node> &l, const std::shared_ptr<Node> &r) {
+    if (l && r) {
+        line_number = line;
+        left = l;
+        right = r;
+    }
+    else {
+        errors.push_back(SyntaxError("Set must have lvalue and rvalue"));
+    }
+}
+
+NodeType SetNode::get_type() {
+    return type;
+}
+
+LoopNode::LoopNode(int line, std::shared_ptr<Node> cond, std::shared_ptr<Node> c) {
+    if (cond == nullptr) {
+        errors.push_back(SyntaxError("Loop must have  a condition"));
+    }
+    else {
+        line_number = line;
+        condition = cond;
+        code = c;
+    }
+}
+
+NodeType LoopNode::get_type() {
+    return type;
+}
+
+// FDeclNode::FDeclNode(int line, std::string n, std::shared_ptr<Node> c, std::vector<std::pair<Datatypes, std::string>> p,
+//                      std::shared_ptr<Node> r) {
+//     line_number = line;
+//     name = n;
+//     code = c;
+//     params = p;
+//     ret = r;
+//     func = std::make_shared<FunctionUnit>(name, params);
+//     func->set_link(std::shared_ptr<FDeclNode>(this));
+// }
+
+NodeType FDeclNode::get_type() {
+    return type;
+}
+
+FcallNode::FcallNode(int line, std::string n, std::vector<std::shared_ptr<Node>> p) : name(n), params(p) {
+    line_number = line;
+}
+
+NodeType FcallNode::get_type() {
+    return type;
+}
+
+SizeofNode::SizeofNode(int line, Datatypes t) {
+    if ( t == Datatypes::INT) {
+        line_number = line;
+        next = std::make_shared<IntLeaf>(MemoryUnit(std::make_shared<Int>()));
+    } else if (t == Datatypes::SHORT) {
+        line_number = line;
+        next = std::make_shared<IntLeaf>(MemoryUnit(std::make_shared<Short>()));
+    } else if (t ==Datatypes::BOOL) {
+        line_number = line;
+        next = std::make_shared<IntLeaf>(MemoryUnit(std::make_shared<Bool>()));
+    } else {
+        errors.push_back(SyntaxError("Can't be computed for a vector"));
+    }
+}
+
+SizeofNode::SizeofNode(int line, std::string n) {
+    line_number = line;
+    next = std::make_shared<VarLeaf>(line, n);
+}
+
+NodeType SizeofNode::get_type() {
+    return type;
+}
+
+IfNode::IfNode(int line, std::shared_ptr<Node> c, std::shared_ptr<Node> i, std::shared_ptr<Node> e) {
+    if (c) {
+        line_number = line;
+        condition = c;
+        if_code = i;
+        else_code = e;
+    }
+    else {
+        errors.push_back(SyntaxError("If must have a condition"));
+    }
+}
+
+NodeType IfNode::get_type() {
+    return type;
+}
+
+VecDeclNode::VecDeclNode(int line, int v, std::string n, std::vector<std::shared_ptr<Node>> e,
+                         std::vector<std::shared_ptr<Node>> d) : vecof_count(v), name(n), elems(e), dims(d), main(true) {
+    line_number = line;
+}
+
+VecDeclNode::VecDeclNode(int line, std::vector<std::shared_ptr<Node>> e) : elems(e) {
+    name = {}; dims = {}; vecof_count = {}; main = false;
+    line_number = line;
+}
+
+void VecDeclNode::init(std::vector<std::shared_ptr<Node>> v, std::shared_ptr<Memory> m) {
+    std::pair<int, std::vector<Object>> p;
+    auto k = false;
+    auto s = 0;
+    for (auto it = v.begin(); it != v.end(); it++) {
+        if ((*it)->get_type() == NodeType::VECDECLNODE) {
+            if (it == v.begin()) {
+                s = std::dynamic_pointer_cast<VecDeclNode>(*it)->elems.size();
+            } else {
+                if (s != std::dynamic_pointer_cast<VecDeclNode>(*it)->elems.size()) {
+                    errors.push_back(SyntaxError("Different sizes"));
+                }
+            }
+            init(std::dynamic_pointer_cast<VecDeclNode>(*it)->elems, m);
+            k = true;
+        } else if (k && (*it)->get_type() != NodeType::VECDECLNODE) {
+            errors.push_back(SyntaxError("Vector error"));
+        } else if (it != v.begin() && !k && (*it)->get_type() != NodeType::VECDECLNODE) {
+            throw SyntaxError("Vector error");
+        } else {
+            auto n = exec(*it, m);
+            if (!n) {
+                errors.push_back(SyntaxError("Error in initialization"));
+            }
+            objects.push_back(n->data);
+        }
+    }
+    if (k) {
+        real_dims.push_back(s);
+    }
+}
+
+NodeType VecDeclNode::get_type() {
+    return type;
+}
+
+IndexNode::IndexNode(int line, std::shared_ptr<Node> n, std::vector<std::shared_ptr<Node>> e) : next(n), elems(e) {
+    if (!next) {
+        errors.push_back(SyntaxError("Vector missed"));
+    }
+    line_number = line;
+}
+
+NodeType IndexNode::get_type() {
+    return type;
+}
+
+VarDeclNode::VarDeclNode(int line, std::string n, Datatypes t, std::shared_ptr<Node> init_node) {
+    line_number = line;
+    std::shared_ptr<Object> obj;
+    if (t == Datatypes::INT) {
+        obj = std::make_shared<Int>();
+    }
+    else if (t == Datatypes::SHORT) {
+        obj = std::make_shared<Short>();
+    }
+    else {
+        obj = std::make_shared<Bool>();
+    }
+    var = std::make_shared<VariableUnit>(n, obj);
+    init = init_node;
+}
+
+VarDeclNode::VarDeclNode(std::string n, std::shared_ptr<MemoryUnit> m) {
+    name = n;
+    var = std::make_shared<VariableUnit>(n, m);
+}
+
+NodeType VarDeclNode::get_type() {
+    return type;
+}
+
+VarListNode::VarListNode(int line, std::pair<Datatypes, std::vector<VarDeclaration>> p) {
+    t = p.first;
+    line_number = line;
+    for (auto it : p.second) {
+        auto e = std::make_shared<VarDeclNode>(line, it.name, t, it.init);
+        vec.push_back(e);
+    }
+}
+
+StatementList::StatementList(std::shared_ptr<Node> n) {
+    if (n)
+        vec.push_back(n);
+}
+
+void StatementList::add(std::shared_ptr<Node> n) {
+    if (n)
+        vec.push_back(n);
+}
+
+NodeType RightNode::get_type() {
+    return type;
+}
+
+NodeType LeftNode::get_type() {
+    return type;
+}
+
+NodeType MoveNode::get_type() {
+    return type;
+}
+
+NodeType LmsNode::get_type() {
+    return type;
+}
+
+FDeclNode::FDeclNode(int line, std::string n, std::shared_ptr<Node> c, std::vector<std::pair<Datatypes, std::string>> p, std::shared_ptr<Node> r) {
+        line_number = line;
+        name = n;
+        code = c;
+        params = p;
+        ret = r;
+        func = std::make_shared<FunctionUnit>(name, params);
+        func->set_link(std::shared_ptr<FDeclNode>(this));
+        functions.push_back(func);
+}
+
+PrintNode::PrintNode(int line, std::shared_ptr<Node> n) {
+    line_number = line;
+    if (!n) {
+        errors.push_back(SyntaxError("Print must have one parameter"));
+    } else {
+        next = n;
+    }
+}
+
+NodeType PrintNode::get_type() {
+    return type;
+}
+
+
+void init_global(std::shared_ptr<Memory> m, bool in_func) {
+    
+}
+
+void init() {
+    std::shared_ptr<FunctionUnit> work;
+    int count = 0;
+    for (auto it : functions) {
+        if (it->name == "work") {
+            count++;
+            work = it;
+            if (count > 1) {
+                errors.push_back(SyntaxError("There can be only 1 function named work"));
+            }
+        }
+    }
+    if (work->params.size() != 0) {
+                errors.push_back(SyntaxError("The work function must have no parameters"));
+    auto m = std::make_shared<Memory>();
+    exec(work->link, m);
+}
 
 void init_labirint(std::string filename) {
     std::ifstream file("lab");
@@ -39,10 +464,6 @@ void init_labirint(std::string filename) {
     }
 }
 
-void init_memory(std::shared_ptr<Node> n) {
-    n->local = std::shared_ptr<Memory>();
-}
-
 std::shared_ptr<MemoryUnit> exec(std::shared_ptr<Node> u, std::shared_ptr<Memory> m) {
     switch (u->get_type())
     {
@@ -51,7 +472,7 @@ std::shared_ptr<MemoryUnit> exec(std::shared_ptr<Node> u, std::shared_ptr<Memory
                 return (*m)[std::dynamic_pointer_cast<VarLeaf>(u)->name];
             }
             catch (const std::exception&) {
-                throw NameError("Variable with this name does not exist");
+                errors.push_back(NameError("Variable with this name does not exist"));
             }
         }
         case NodeType::INTLEAF: {

@@ -440,6 +440,7 @@ private:
     std::shared_ptr<Memory> parent;
     std::map<std::string, std::shared_ptr<MemoryUnit>> local;
 public:
+    Memory() = default;
     Memory(std::shared_ptr<Memory> p) : parent(p) {}
     Memory(const Memory& m) : parent(m.parent), local(m.local) {}
     void clear() {
