@@ -38,11 +38,11 @@ std::pair<Datatypes, std::vector<VarDeclaration>>* vd_list;
 %token THEN
 %nonassoc IFX
 %nonassoc ELSE
-%left AND
-%left OR
-%left NAND NOR
 %left LARGER SMALLER
 %left ADD SUB
+%left NAND NOR
+%left OR
+%left AND
 //%nonassoc '['
 
 %type <Node_> program
@@ -299,3 +299,4 @@ int main() {
 	init(new Memory(), root);
     return 0;
 }
+
