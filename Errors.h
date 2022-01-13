@@ -9,8 +9,7 @@
 class Exception : public std::exception {
 public:
     std::string msg;
-    int line;
-    
+
     Exception(std::string s) : msg(s) {}
     virtual std::string what() {return msg;}
     virtual ~Exception() = default;

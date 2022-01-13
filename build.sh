@@ -1,5 +1,5 @@
-bison -d -t --report=all --report-file=report grammar.y 
-#bison -d --report=all --report-file=report grammar.y 
+bison -d -t --report=all --report-file=report grammar.y
+#bison -d --report=all --report-file=report grammar.y
 flex lexer.l
 g++ -g -O -c grammar.tab.c
 g++ -g -O -c lex.yy.c

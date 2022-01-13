@@ -16,9 +16,9 @@ enum Logic {TRUE, FALSE, UNDEFINED};
 class Object {
 public:
     virtual ~Object() = default;
-    virtual Datatypes get_type() = 0;
-    virtual bool operator==(std::shared_ptr<Object>) = 0;
-    virtual void operator=(std::shared_ptr<Object>) = 0;
+    virtual Datatypes get_type() {}
+    virtual bool operator==(Object*) {}
+    virtual void operator=(Object*) {}
     virtual operator int() {
         throw CastError("Can't convert to int");
     }
@@ -42,14 +42,14 @@ public:
     virtual Datatypes get_type() {
         return type;
     }
-    virtual bool operator==(std::shared_ptr<Object> obj) {
+    virtual bool operator==(Object* obj) {
         if (value == (int)*obj) {
             return true;
         } else {
             return false;
         }
     }
-    virtual void operator=(std::shared_ptr<Object> obj) {
+    virtual void operator=(Object* obj) {
         value = (int)*obj;
     }
     virtual operator int() {
@@ -83,7 +83,7 @@ public:
     virtual Datatypes get_type() {
         return type;
     }
-    virtual bool operator==(std::shared_ptr<Object> obj) {
+    virtual bool operator==(Object* obj) {
         if (value == (int)*obj) {
             return true;
         }
@@ -91,7 +91,7 @@ public:
             return false;
         }
     }
-    virtual void operator=(std::shared_ptr<Object> obj) {
+    virtual void operator=(Object* obj) {
         value = (short)*obj;
     }
     virtual operator int() {
@@ -125,7 +125,7 @@ public:
     virtual Datatypes get_type() {
         return type;
     }
-    virtual bool operator==(std::shared_ptr<Object> obj) {
+    virtual bool operator==(Object* obj) {
         if (value == obj->to_bool()) {
             return true;
         }
@@ -133,7 +133,7 @@ public:
             return false;
         }
     }
-    virtual void operator=(std::shared_ptr<Object> obj) {
+    virtual void operator=(Object* obj) {
         value = obj->to_bool();
     }
     virtual operator int() {
@@ -166,7 +166,7 @@ public:
 
 class Vector : public Object {
 public:
-    std::shared_ptr<Object>* vec;
+    Object** vec;
     std::vector<int> dimentions;
     int count;
     Datatypes type = VECTOR;
@@ -184,17 +184,19 @@ public:
         }
         count = c;
         dims = dimentions;
-        vec = new std::shared_ptr<Object>[count];
-        /*for (int i = 0; i < count; i++) {
-            vec.push_back(std::make_shared<Object>());
-        }*/
+        vec = new Object*[count];
+        for (int i = 0; i < count; i++) {
+            vec[i] = new Object();
+        }
     }
-    Vector(std::vector<std::shared_ptr<Object>> v) {
-        vec = new std::shared_ptr<Object>[v.size()];
-        for (int i = 0; i < v.size(); i++)
+    Vector(std::vector<Object*> v) {
+        vec = new Object*[v.size()];
+        for (int i = 0; i < v.size(); i++) {
+            vec[i] = new Object();
             vec[i] = v[i];
+        }
     }
-    Vector(std::vector<int> dims, std::vector<std::shared_ptr<Object>> v) {
+    Vector(std::vector<int> dims, std::vector<Object*> v) {
         auto c = 1;
         for (auto it : dims) {
             if (it < 0)
@@ -210,16 +212,18 @@ public:
         }
         count = c;
         dimentions = dims;
-        vec = new std::shared_ptr<Object>[v.size()];
-        for (int i = 0; i < v.size(); i++)
+        vec = new Object*[v.size()];
+        for (int i = 0; i < v.size(); i++) {
+            vec[i] = new Object();
             vec[i] = v[i];
+        }
     }
     Vector(Vector&& v) : vec(std::move(v.vec)), dimentions(std::move(v.dimentions)) {}
-    virtual bool operator==(std::shared_ptr<Object> obj) {
+    virtual bool operator==(Object* obj) {
         if (obj->get_type() != Datatypes::VECTOR) {
             throw TypeError("Vector cannot be compared with other types");
         }
-        auto v = std::dynamic_pointer_cast<Vector>(obj);
+        auto v = dynamic_cast<Vector*>(obj);
         if (v->count != count) {
             return false;
         }
@@ -238,15 +242,15 @@ public:
         }
         return true;
     }
-    virtual void operator=(std::shared_ptr<Object> obj) {
-        auto v = std::dynamic_pointer_cast<Vector>(obj);
+    virtual void operator=(Object* obj) {
+        auto v = dynamic_cast<Vector*>(obj);
         vec = v->vec;
         dimentions = v->dimentions;
     }
     virtual Datatypes get_type() {
         return type;
     }
-    std::shared_ptr<Object> operator[](std::vector<int> dims) {
+    Object* operator[](std::vector<int> dims) {
         if (dimentions.size() != dims.size()) {
             throw OverflowError("Out of range");
         }

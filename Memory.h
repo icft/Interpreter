@@ -7,12 +7,18 @@ enum UnitType {VARIABLE, FUNCTION};
 
 class MemoryUnit {
 public:
-    std::shared_ptr<Object> data;
+    Object* data;
 
     MemoryUnit() : data(nullptr) {}
-    MemoryUnit(std::shared_ptr<Object> d, bool l = false) : data(d) {}
-    MemoryUnit(MemoryUnit& m) : data(m.data) {}
-    MemoryUnit(MemoryUnit&& m) : data(std::move(m.data)) {}
+    MemoryUnit(Object* d, bool l = false) {
+        data = d;
+    }
+    MemoryUnit(MemoryUnit& m) {
+        data = m.data;
+    }
+    MemoryUnit(MemoryUnit&& m) {
+        data = m.data;
+    }
     MemoryUnit set(const MemoryUnit& m) {
         data = m.data;
         return *this;
@@ -21,34 +27,34 @@ public:
         try {
             MemoryUnit res;
             if (data->get_type() == Datatypes::SHORT && m.data->get_type() == Datatypes::SHORT) {
-                auto s1 = std::dynamic_pointer_cast<Short>(data);
-                auto s2 = std::dynamic_pointer_cast<Short>(m.data);
+                auto s1 = dynamic_cast<Short*>(data);
+                auto s2 = dynamic_cast<Short*>(m.data);
                 if (s2->value >= 0) {
                     if (s1->value > INT16_MAX - s2->value) {
-                        res.data = std::make_shared<Int>((int)*data + (int)*m.data);
+                        res.data = new Int((int)*data + (int)*m.data);
                     }
                     else {
-                        res.data = std::make_shared<Short>((short)*data + (short)*m.data);
+                        res.data = new Short((short)*data + (short)*m.data);
                     }
                 }
                 else {
                     if (s1->value < INT16_MIN - s2->value) {
-                        res.data = std::make_shared<Int>((int)*data + (int)*m.data);
+                        res.data = new Int((int)*data + (int)*m.data);
                     }
                     else {
-                        res.data = std::make_shared<Short>((short)*data + (short)*m.data);
+                        res.data = new Short((short)*data + (short)*m.data);
                     }
                 }
             }
             else if (data->get_type() == Datatypes::INT && m.data->get_type() == Datatypes::INT) {
-                auto i1 = std::dynamic_pointer_cast<Int>(data);
-                auto i2 = std::dynamic_pointer_cast<Int>(m.data);
+                auto i1 = dynamic_cast<Int*>(data);
+                auto i2 = dynamic_cast<Int*>(m.data);
                 if (i2->value >= 0) {
                     if (i1->value > INT32_MAX - i2->value) {
                         throw OverflowError("Int Overflow");
                     }
                     else {
-                        res.data = std::make_shared<Int>((int)*data + (int)*m.data);
+                        res.data = new Int((int)*data + (int)*m.data);
                     }
                 }
                 else {
@@ -56,23 +62,23 @@ public:
                         throw OverflowError("Int Overflow");
                     }
                     else {
-                        res.data = std::make_shared<Int>((int)*data + (int)*m.data);
+                        res.data = new Int((int)*data + (int)*m.data);
                     }
                 }
             }
             else if (data->get_type() == Datatypes::SHORT && m.data->get_type() == Datatypes::INT) {
-                auto s = std::dynamic_pointer_cast<Short>(data);
-                auto i = std::dynamic_pointer_cast<Int>(m.data);
+                auto s = dynamic_cast<Short*>(data);
+                auto i = dynamic_cast<Int*>(m.data);
                 if (i->value >= 0) {
                     if (s->value > INT32_MAX - i->value) {
                         throw OverflowError("Int Overflow");
                     }
                     else {
                         if (s->value > INT16_MAX - i->value) {
-                            res.data = std::make_shared<Int>((int)*data + (int)*m.data);
+                            res.data = new Int((int)*data + (int)*m.data);
                         }
                         else {
-                            res.data = std::make_shared<Short>((int)*data + (int)*m.data);
+                            res.data = new Short((short)*data + (short)*m.data);
                         }
                     }
                 }
@@ -82,27 +88,27 @@ public:
                     }
                     else {
                         if (s->value < INT16_MIN - i->value) {
-                            res.data = std::make_shared<Int>((int)*data + (int)*m.data);
+                            res.data = new Int((int)*data + (int)*m.data);
                         }
                         else {
-                            res.data = std::make_shared<Short>((int)*data + (int)*m.data);
+                            res.data = new Short((short)*data + (short)*m.data);
                         }
                     }
                 }
             }
             else if (data->get_type() == Datatypes::INT && m.data->get_type() == Datatypes::SHORT) {
-                auto i = std::dynamic_pointer_cast<Int>(data);
-                auto s = std::dynamic_pointer_cast<Short>(m.data);
+                auto i = dynamic_cast<Int*>(data);
+                auto s = dynamic_cast<Short*>(m.data);
                 if (s->value >= 0) {
                     if (i->value > INT32_MAX - s->value) {
                         throw OverflowError("Int Overflow");
                     }
                     else {
                         if (i->value > INT16_MAX - s->value) {
-                            res.data = std::make_shared<Int>((int)*data + (int)*m.data);
+                            res.data = new Int((int)*data + (int)*m.data);
                         }
                         else {
-                            res.data = std::make_shared<Short>((int)*data + (int)*m.data);
+                            res.data =new Short((short)*data + (short)*m.data);
                         }
                     }
                 }
@@ -112,10 +118,10 @@ public:
                     }
                     else {
                         if (i->value < INT16_MIN - s->value) {
-                            res.data = std::make_shared<Int>((int)*data + (int)*m.data);
+                            res.data = new Int((int)*data + (int)*m.data);
                         }
                         else {
-                            res.data = std::make_shared<Short>((int)*data + (int)*m.data);
+                            res.data = new Short((short)*data + (short)*m.data);
                         }
                     }
                 }
@@ -130,34 +136,34 @@ public:
         try {
             MemoryUnit res;
             if (data->get_type() == Datatypes::SHORT && m.data->get_type() == Datatypes::SHORT) {
-                auto s1 = std::dynamic_pointer_cast<Short>(data);
-                auto s2 = std::dynamic_pointer_cast<Short>(m.data);
+                auto s1 = dynamic_cast<Short*>(data);
+                auto s2 = dynamic_cast<Short*>(m.data);
                 if (s2->value >= 0) {
                     if (s1->value < INT16_MIN + s2->value) {
-                        res.data = std::make_shared<Int>((int)*data - (int)*m.data);
+                        res.data = new Int((int)*data - (int)*m.data);
                     }
                     else {
-                        res.data = std::make_shared<Short>((short)*data - (short)*m.data);
+                        res.data = new Short((short)*data - (short)*m.data);
                     }
                 }
                 else {
                     if (s1->value > INT16_MAX + s2->value) {
-                        res.data = std::make_shared<Int>((int)*data - (int)*m.data);
+                        res.data = new Int((int)*data - (int)*m.data);
                     }
                     else {
-                        res.data = std::make_shared<Short>((short)*data - (short)*m.data);
+                        res.data = new Short((short)*data - (short)*m.data);
                     }
                 }
             }
             else if (data->get_type() == Datatypes::INT && m.data->get_type() == Datatypes::INT) {
-                auto i1 = std::dynamic_pointer_cast<Int>(data);
-                auto i2 = std::dynamic_pointer_cast<Int>(m.data);
+                auto i1 = dynamic_cast<Int*>(data);
+                auto i2 = dynamic_cast<Int*>(m.data);
                 if (i2->value >= 0) {
                     if (i1->value < INT32_MIN + i2->value) {
                         throw OverflowError("Int Overflow");
                     }
                     else {
-                        res.data = std::make_shared<Int>((int)*data - (int)*m.data);
+                        res.data = new Int((int)*data - (int)*m.data);
                     }
                 }
                 else {
@@ -165,23 +171,23 @@ public:
                         throw OverflowError("Int Overflow");
                     }
                     else {
-                        res.data = std::make_shared<Int>((int)*data - (int)*m.data);
+                        res.data = new Int((short)*data - (short)*m.data);
                     }
                 }
             }
             else if (data->get_type() == Datatypes::SHORT && m.data->get_type() == Datatypes::INT) {
-                auto s = std::dynamic_pointer_cast<Short>(data);
-                auto i = std::dynamic_pointer_cast<Int>(m.data);
+                auto s = dynamic_cast<Short*>(data);
+                auto i = dynamic_cast<Int*>(m.data);
                 if (i->value >= 0) {
                     if (s->value < INT32_MIN + i->value) {
                         throw OverflowError("Int Overflow");
                     }
                     else {
                         if (s->value < INT16_MIN + i->value) {
-                            res.data = std::make_shared<Int>((int)*data - (int)*m.data);
+                            res.data = new Int((int)*data - (int)*m.data);
                         }
                         else {
-                            res.data = std::make_shared<Short>((int)*data - (int)*m.data);
+                            res.data = new Short((short)*data - (short)*m.data);
                         }
                     }
                 }
@@ -191,27 +197,27 @@ public:
                     }
                     else {
                         if (s->value > INT16_MAX + i->value) {
-                            res.data = std::make_shared<Int>((int)*data - (int)*m.data);
+                            res.data = new Int((int)*data - (int)*m.data);
                         }
                         else {
-                            res.data = std::make_shared<Short>((int)*data - (int)*m.data);
+                            res.data = new Short((short)*data - (short)*m.data);
                         }
                     }
                 }
             }
             else if (data->get_type() == Datatypes::INT && m.data->get_type() == Datatypes::SHORT) {
-                auto i = std::dynamic_pointer_cast<Int>(data);
-                auto s = std::dynamic_pointer_cast<Short>(m.data);
+                auto i = dynamic_cast<Int*>(data);
+                auto s = dynamic_cast<Short*>(m.data);
                 if (s->value >= 0) {
                     if (i->value < INT32_MIN + s->value) {
                         throw OverflowError("Int Overflow");
                     }
                     else {
                         if (i->value > INT16_MIN + s->value) {
-                            res.data = std::make_shared<Int>((int)*data - (int)*m.data);
+                            res.data = new Int((int)*data - (int)*m.data);
                         }
                         else {
-                            res.data = std::make_shared<Short>((int)*data - (int)*m.data);
+                            res.data = new Short((int)*data - (int)*m.data);
                         }
                     }
                 }
@@ -221,10 +227,10 @@ public:
                     }
                     else {
                         if (i->value > INT16_MAX + s->value) {
-                            res.data = std::make_shared<Int>((int)*data - (int)*m.data);
+                            res.data = new Int((int)*data - (int)*m.data);
                         }
                         else {
-                            res.data = std::make_shared<Short>((int)*data - (int)*m.data);
+                            res.data = new Short((int)*data - (int)*m.data);
                         }
                     }
                 }
@@ -239,13 +245,13 @@ public:
         MemoryUnit res;
         try {
             if (data->to_bool() == Logic::UNDEFINED || m.data->to_bool() == Logic::UNDEFINED) {
-                res.data = std::make_shared<Bool>(Logic::UNDEFINED);
+                res.data = new Bool(Logic::UNDEFINED);
             }
             else if (data->to_bool() == Logic::FALSE || m.data->to_bool() == Logic::FALSE) {
-                res.data = std::make_shared<Bool>(Logic::FALSE);
+                res.data = new Bool(Logic::FALSE);
             }
             else {
-                res.data = std::make_shared<Bool>(Logic::TRUE);
+                res.data = new Bool(Logic::TRUE);
             }
         } catch (const std::exception& ex) {
             throw ex;
@@ -256,13 +262,13 @@ public:
         MemoryUnit res;
         try {
             if (data->to_bool() == Logic::UNDEFINED || m.data->to_bool() == Logic::UNDEFINED) {
-                res.data = std::make_shared<Bool>(Logic::UNDEFINED);
+                res.data = new Bool(Logic::UNDEFINED);
             }
             else if (data->to_bool() == Logic::FALSE && m.data->to_bool() == Logic::FALSE) {
-                res.data = std::make_shared<Bool>(Logic::FALSE);
+                res.data = new Bool(Logic::FALSE);
             }
             else {
-                res.data = std::make_shared<Bool>(Logic::TRUE);
+                res.data = new Bool(Logic::TRUE);
             }
         } catch (const std::exception& ex) {
             throw ex;
@@ -273,13 +279,13 @@ public:
         MemoryUnit res;
         try {
             if (data->to_bool() == Logic::UNDEFINED || m.data->to_bool() == Logic::UNDEFINED) {
-                res.data = std::make_shared<Bool>(Logic::UNDEFINED);
+                res.data = new Bool(Logic::UNDEFINED);
             }
             else if (data->to_bool() == Logic::TRUE && m.data->to_bool() == Logic::TRUE) {
-                res.data = std::make_shared<Bool>(Logic::FALSE);
+                res.data = new Bool(Logic::FALSE);
             }
             else {
-                res.data = std::make_shared<Bool>(Logic::TRUE);
+                res.data = new Bool(Logic::TRUE);
             }
         }
         catch (const std::exception& ex) {
@@ -291,13 +297,13 @@ public:
         MemoryUnit res;
         try {
             if (data->to_bool() == Logic::UNDEFINED || m.data->to_bool() == Logic::UNDEFINED) {
-                res.data = std::make_shared<Bool>(Logic::UNDEFINED);
+                res.data = new Bool(Logic::UNDEFINED);
             }
             else if (data->to_bool() == Logic::FALSE && m.data->to_bool() == Logic::FALSE) {
-                res.data = std::make_shared<Bool>(Logic::TRUE);
+                res.data = new Bool(Logic::TRUE);
             }
             else {
-                res.data = std::make_shared<Bool>(Logic::FALSE);
+                res.data = new Bool(Logic::FALSE);
             }
         }
         catch (const std::exception& ex) {
@@ -309,13 +315,13 @@ public:
         MemoryUnit res;
         try {
             if ((int)(*data) > (int)(*m.data)) {
-                res.data = std::make_shared<Bool>(Logic::FALSE);
+                res.data = new Bool(Logic::FALSE);
             }
             else if ((int)(*data) > (int)(*m.data)) {
-                res.data = std::make_shared<Bool>(Logic::TRUE);
+                res.data = new Bool(Logic::TRUE);
             }
             else {
-                res.data = std::make_shared<Bool>(Logic::UNDEFINED);
+                res.data = new Bool(Logic::UNDEFINED);
             }
         }
         catch (const std::exception& ex) {
@@ -327,13 +333,13 @@ public:
         MemoryUnit res;
         try {
             if ((int)(*data) > (int)(*m.data)) {
-                res.data = std::make_shared<Bool>(Logic::TRUE);
+                res.data = new Bool(Logic::TRUE);
             }
             else if ((int)(*data) < (int)(*m.data)) {
-                res.data = std::make_shared<Bool>(Logic::FALSE);
+                res.data = new Bool(Logic::FALSE);
             }
             else {
-                res.data = std::make_shared<Bool>(Logic::UNDEFINED);
+                res.data = new Bool(Logic::UNDEFINED);
             }
         }
         catch (const std::exception& ex) {
@@ -344,13 +350,13 @@ public:
     MemoryUnit size_of() {
         MemoryUnit res;
         if (data->get_type() == Datatypes::INT) {
-            res.data = std::make_shared<Int>(32);
+            res.data = new Short(32);
         }
         if (data->get_type() == Datatypes::SHORT) {
-            res.data = std::make_shared<Int>(16);
+            res.data = new Short(16);
         }
         if (data->get_type() == Datatypes::BOOL) {
-            res.data = std::make_shared<Int>(16);
+            res.data = new Short(16);
         }
         if (data->get_type() == Datatypes::VECTOR) {
             throw TypeError("Sizeof can't be used with type vector");
@@ -359,7 +365,7 @@ public:
     }
     MemoryUnit operator[](std::vector<int> dims) {
         if (data->get_type() == Datatypes::VECTOR) {
-            return MemoryUnit((*std::dynamic_pointer_cast<Vector>(data))[dims]);
+            return MemoryUnit((*dynamic_cast<Vector*>(data))[dims]);
         } else {
             throw TypeError("Index operator only for vector");
         }
@@ -368,7 +374,7 @@ public:
     ~MemoryUnit() = default;
 };
 
-bool contains(std::map<std::string, std::shared_ptr<MemoryUnit>> m, std::string s);
+bool contains(std::map<std::string, MemoryUnit*> m, std::string s);
 
 class VariableUnit : public MemoryUnit {
 public:
@@ -376,8 +382,8 @@ public:
     UnitType type = VARIABLE;
 
     ~VariableUnit() = default;
-    VariableUnit(std::string s, std::shared_ptr<MemoryUnit> m) : name(s), MemoryUnit(*m) {}
-    VariableUnit(std::string n, std::shared_ptr<Object> obj) : name(n), MemoryUnit(obj) {}
+    VariableUnit(std::string s, MemoryUnit* m) : name(s), MemoryUnit(*m) {}
+    VariableUnit(std::string n, Object* obj) : name(n), MemoryUnit(obj) {}
     std::string get_name() {
         return name;
     }
@@ -392,7 +398,7 @@ class FunctionUnit : public MemoryUnit {
 public:
     std::string name;
     std::vector<std::pair<Datatypes, std::string>> params;
-    std::shared_ptr<Node> link;
+    Node* link;
     UnitType type = FUNCTION;
 
     FunctionUnit(std::string n, std::vector<std::pair<Datatypes, std::string>> p) {
@@ -400,10 +406,10 @@ public:
         params = p;
     }
     ~FunctionUnit() = default;
-    void set_link(std::shared_ptr<Node> f) {
+    void set_link(Node* f) {
         link = f;
     }
-    std::shared_ptr<Node> get_link() {
+    Node* get_link() {
         return link;
     }
     std::string get_name() {
@@ -437,45 +443,52 @@ public:
 
 class Memory {
 private:
-    std::shared_ptr<Memory> parent;
-    std::map<std::string, std::shared_ptr<MemoryUnit>> local;
+    Memory* parent;
+    std::map<std::string, MemoryUnit*> local;
 public:
     Memory() = default;
-    Memory(std::shared_ptr<Memory> p) : parent(p) {}
-    Memory(const Memory& m) : parent(m.parent), local(m.local) {}
+    Memory(Memory* p) {
+        parent = new Memory();
+        parent = p;
+    }
+    Memory(const Memory& m){
+        parent = new Memory();
+        parent = m.parent;
+        local = m.local;
+    }
     void clear() {
         local.clear();
         parent = nullptr;
     }
-    void add(std::shared_ptr<VariableUnit> var) {
+    void add(VariableUnit* var) {
         if (contains(local, var->get_name())) {
             throw MemoryError("Variable with this name exists");
         }
         local[var->get_name()] = var;
     }
-    void add(std::shared_ptr<FunctionUnit> func) {
+    void add(FunctionUnit* func) {
         if (contains(local, func->get_name())) {
             throw MemoryError("Function with this name exists");
         }
         local[func->get_name()] = func;
     }
-    std::shared_ptr<VariableUnit> operator[](std::string name) {
+    VariableUnit* operator[](std::string name) {
         if (local[name]->get_type() != UnitType::VARIABLE) {
             throw MemoryError("Variable with this name doesn't exists");
         } else if (contains(local, name) && local[name]->get_type() == UnitType::VARIABLE) {
-            return std::dynamic_pointer_cast<VariableUnit>(local[name]);
+            return dynamic_cast<VariableUnit*>(local[name]);
         } else {
             return (*parent)[name];
         }
     }
-    std::shared_ptr<FunctionUnit> operator[](std::pair<std::string, std::vector<Datatypes>> p) {
+    FunctionUnit* operator[](std::pair<std::string, std::vector<Datatypes>> p) {
         if (local[p.first]->get_type() != UnitType::FUNCTION) {
             throw MemoryError("Function with this name doesn't exists");
         } else if (contains(local, p.first) && local[p.first]->get_type() == UnitType::FUNCTION) {
-            if (!std::dynamic_pointer_cast<FunctionUnit>(local[p.first])->check_all(p.second)) {
+            if (!dynamic_cast<FunctionUnit*>(local[p.first])->check_all(p.second)) {
                 throw TypeError("Error in arg list");
             } else {
-                return std::dynamic_pointer_cast<FunctionUnit>(local[p.first]);
+                return dynamic_cast<FunctionUnit*>(local[p.first]);
             }
         } else {
             return (*parent)[p];
