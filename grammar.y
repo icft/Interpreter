@@ -39,11 +39,8 @@ std::pair<Datatypes, std::vector<VarDeclaration>>* vd_list;
 //%token FIRST SECOND
 %nonassoc IFX
 %nonassoc ELSE
-<<<<<<< HEAD
 %left S_LARGER S_SMALLER F_LARGER F_SMALLER
-=======
 %left LARGER SMALLER
->>>>>>> 56bb345b13c871f58b7ffb1d31808a36c7800b9c
 %left ADD SUB
 %left NAND NOR
 %left OR
