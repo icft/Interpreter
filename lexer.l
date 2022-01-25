@@ -23,8 +23,10 @@ void yyerror(const char *);
 (set)                         {return SET;}
 (add)		                  {return ADD;}
 (sub)		                  {return SUB;}
-(smaller)                     {return SMALLER;}
-(larger)		              {return LARGER;}
+(first[ \t]*smaller)          {return F_SMALLER;}
+(first[ \t]*larger)		      {return F_LARGER;}
+(second[ \t]*smaller)         {return S_SMALLER;}
+(second[ \t]*larger)          {return S_LARGER;}
 (not[ \t]*or)                 {return NOR;}
 (or)	                      {return OR;}
 (not[ \t]*and)                {return NAND;}
@@ -50,3 +52,4 @@ void yyerror(const char *);
 .				              {yyerror(yytext);}
 
 %%
+
