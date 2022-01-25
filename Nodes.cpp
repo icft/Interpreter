@@ -152,11 +152,12 @@ NodeType NorNode::get_type() {
     return type;
 }
 
-SmallerNode::SmallerNode(int line, Node* l, Node* r) {
+SmallerNode::SmallerNode(int line, Node* l, Node* r, bool il) {
     if (l && r) {
         line_number = line;
         left = l;
         right = r;
+        is_left = il;
     }
     else {
         errors.push_back(SyntaxError("Smaller must have 2 parameters"));
@@ -167,11 +168,12 @@ NodeType SmallerNode::get_type() {
     return type;
 }
 
-LargerNode::LargerNode(int line, Node* l, Node* r) {
+LargerNode::LargerNode(int line, Node* l, Node* r, bool il) {
     if (l && r) {
         line_number = line;
         left = l;
         right = r;
+        is_left = il;
     }
     else {
         errors.push_back(SyntaxError("Larger must have 2 parameters"));
@@ -416,6 +418,13 @@ NodeType PrintNode::get_type() {
     return type;
 }
 
+NodeType StatementList::get_type() {
+    return type;
+}
+
+NodeType VarListNode::get_type() {
+    return type;
+}
 
 // std::shared_ptr<Memory> init_global(std::shared_ptr<Node> root) {
 //     auto m = std::make_shared<Memory>();
@@ -457,24 +466,9 @@ void init(Memory* m, Node* root) {
         errors.push_back(SyntaxError("The work function must have no parameters"));
     }
     auto t = dynamic_cast<FDeclNode*>(work)->code;
+//    std::cout << "Code size: " << dynamic_cast<StatementList*>(t)->vec.size() << std::endl;
     exec(t, m);
 }
-//     std::shared_ptr<FunctionUnit> work;
-//     int count = 0;
-//     for (auto it : functions) {
-//         if (it->name == "work") {
-//             count++;
-//             work = it;
-//             if (count > 1) {
-//                 errors.push_back(SyntaxError("There can be only 1 function named work"));
-//             }
-//         }
-//     }
-//     if (work->params.size() != 0) {
-//                 errors.push_back(SyntaxError("The work function must have no parameters"));
-//     exec(work->link, m);
-//     }
-//  }
 
 void init_labirint(std::string filename) {
     std::ifstream file("lab");
@@ -505,7 +499,7 @@ void init_labirint(std::string filename) {
 }
 
 MemoryUnit* exec(Node* u, Memory* m) {
-    std::cout << "NodeType: " << u->get_type() << std::endl;
+    //std::cout << "NodeType: " << u->get_type() << std::endl;
     switch (u->get_type())
     {
         case NodeType::VARLEAF: {
@@ -518,10 +512,11 @@ MemoryUnit* exec(Node* u, Memory* m) {
         }
         case NodeType::INTLEAF: {
             try {
-                return dynamic_cast<IntLeaf*>(u)->data;
+                auto ret = dynamic_cast<IntLeaf*>(u);
+                return ret->data;
             }
             catch (std::exception& ex) {
-                throw ex.what();
+                errors.push_back(ex);
             }
         }
         case NodeType::SHORTLEAF: {
@@ -529,7 +524,7 @@ MemoryUnit* exec(Node* u, Memory* m) {
                 return dynamic_cast<ShortLeaf*>(u)->data;
             }
             catch (std::exception& ex) {
-                throw ex.what();
+                errors.push_back(ex);
             }
         }
         case NodeType::BOOLLEAF: {
@@ -537,7 +532,7 @@ MemoryUnit* exec(Node* u, Memory* m) {
                 return dynamic_cast<BoolLeaf*>(u)->data;
             }
             catch (std::exception& ex) {
-                throw ex.what();
+                errors.push_back(ex);
             }
         }
         case NodeType::ADDNODE: {
@@ -573,12 +568,30 @@ MemoryUnit* exec(Node* u, Memory* m) {
         case NodeType::SMALLERNODE: {
             auto e1 = exec(dynamic_cast<SmallerNode*>(u)->left, m);
             auto e2 = exec(dynamic_cast<SmallerNode*>(u)->right, m);
-            return (e1 && e2) ? new MemoryUnit(e1->smaller(*e2)) : throw SyntaxError("Smaller must have 2 parameters");
+            if (e1 && e2) {
+                if (dynamic_cast<SmallerNode*>(u)->is_left) {
+                    return new MemoryUnit(e1->smaller(*e2));
+                } else {
+                    return new MemoryUnit(e2->smaller(*e1));
+                }
+            } else {
+                throw SyntaxError("Smaller must have 2 parameters");
+            }
+//            return (e1 && e2) ? new MemoryUnit(e1->smaller(*e2)) : throw SyntaxError("Smaller must have 2 parameters");
         }
         case NodeType::LARGERNODE: {
             auto e1 = exec(dynamic_cast<LargerNode*>(u)->left, m);
             auto e2 = exec(dynamic_cast<LargerNode*>(u)->right, m);
-            return (e1 && e2) ? new MemoryUnit(e1->larger(*e2)) : throw SyntaxError("Larger must have 2 parameters");
+            if (e1 && e2) {
+                if (dynamic_cast<LargerNode*>(u)->is_left) {
+                    return new MemoryUnit(e1->larger(*e2));
+                } else {
+                    return new MemoryUnit(e2->larger(*e1));
+                }
+            } else {
+                throw SyntaxError("Smaller must have 2 parameters");
+            }
+//            return (e1 && e2) ? new MemoryUnit(e1->larger(*e2)) : throw SyntaxError("Larger must have 2 parameters");
         }
         case NodeType::SETNODE: {
             auto e1 = exec(dynamic_cast<SetNode*>(u)->left, m);
@@ -627,7 +640,9 @@ MemoryUnit* exec(Node* u, Memory* m) {
         case NodeType::VARDECLNODE: {
             auto v = dynamic_cast<VarDeclNode*>(u);
             try {
+                std::cout << 1 << std::endl;
                 m->add(v->var);
+                std::cout << 2 << std::endl;
                 if (v->init) {
                     auto i = exec(v->init, m);
                     if(i) {
@@ -640,12 +655,13 @@ MemoryUnit* exec(Node* u, Memory* m) {
             } catch (std::exception ex) {
                 throw ex;
             }
+            std::cout << 3 << std::endl;
         }
         case NodeType::VARLIST: {
             auto v = dynamic_cast<VarListNode*>(u);
             try {
-                for (auto it : v->vec) {
-                    exec(it, m);
+                for (int i = 0; i < v->vec.size(); i++) {
+                    exec(v->vec[i], m);
                 }
             } catch (std::exception ex) {
                 throw ex;
@@ -769,8 +785,10 @@ MemoryUnit* exec(Node* u, Memory* m) {
             return new MemoryUnit((*v)[tmp]);
         }
         case NodeType::STATEMENT: {
-            for (auto v : dynamic_cast<StatementList*>(u)->vec)
+            for (auto v : dynamic_cast<StatementList*>(u)->vec) {
+                std::cout << 2122121 << std::endl;
                 exec(v, m);
+            }
             return nullptr;
         }
         case NodeType::RIGHTNODE: {
