@@ -761,10 +761,11 @@ class SmallerNode : public Node {
 public:
     Node* left;
     Node* right;
+    bool is_left;
     NodeType type = NodeType::SMALLERNODE;
-
+    
     SmallerNode() = default;
-    SmallerNode(int line, Node* l, Node* r);
+    SmallerNode(int line, Node* l, Node* r, bool il);
     virtual ~SmallerNode() = default;
     virtual NodeType get_type();
 };
@@ -773,10 +774,11 @@ class LargerNode : public Node {
 public:
     Node* left;
     Node* right;
+    bool is_left;
     NodeType type = NodeType::LARGERNODE;
 
     LargerNode() = default;
-    LargerNode(int line, Node* l, Node* r);
+    LargerNode(int line, Node* l, Node* r, bool il);
     virtual ~LargerNode() = default;
     virtual NodeType get_type();
 };
@@ -916,6 +918,7 @@ public:
     NodeType type = NodeType::VARLIST;
 
     VarListNode(int line, std::pair<Datatypes, std::vector<VarDeclaration>> p);
+    virtual NodeType get_type();
     ~VarListNode() = default;
 };
 
@@ -927,6 +930,7 @@ public:
     StatementList() = default;
     StatementList(Node* n);
     void add(Node* n);
+    virtual NodeType get_type();
     virtual ~StatementList() = default;
 };
 
