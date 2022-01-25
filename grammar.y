@@ -36,9 +36,14 @@ std::pair<Datatypes, std::vector<VarDeclaration>>* vd_list;
 %token FUNC RETURN
 %token SIZEOF
 %token THEN
+//%token FIRST SECOND
 %nonassoc IFX
 %nonassoc ELSE
+<<<<<<< HEAD
+%left S_LARGER S_SMALLER F_LARGER F_SMALLER
+=======
 %left LARGER SMALLER
+>>>>>>> 56bb345b13c871f58b7ffb1d31808a36c7800b9c
 %left ADD SUB
 %left NAND NOR
 %left OR
@@ -87,25 +92,25 @@ stmt:
 															}
 	| ';'												    {$$=nullptr;}
 	| expr ';'											    {$$=$1;
-															delete $1;
+//															delete $1;
 															}
 	| decl ';'											    {$$=$1;
-															delete $1;
+//															delete $1;
 															}
     | directions ';'									    {$$=$1;
-															delete $1;
+//															delete $1;
 															}
 	| expr SET expr ';'									    {$$=new SetNode(yylineno, $1, $3);
-															delete $1; delete $3;
+//															delete $1; delete $3;
 															}
 	| DO stmt WHILE expr ';'							    {$$=new LoopNode(yylineno, $4, $2);
-															delete $2; delete $4;
+//															delete $2; delete $4;
 															}
 	| IF expr THEN stmt %prec IFX						    {$$=new IfNode(yylineno, $2, $4);
-															delete $2; delete $4;
+//															delete $2; delete $4;
 															}
 	| IF expr THEN stmt ELSE stmt						    {$$=new IfNode(yylineno, $2, $4, $6);
-															delete $2; delete $4; delete $6;
+//															delete $2; delete $4; delete $6;
 															}
 	| FUNC NAME argslist BEGIN_ stmt_list END RETURN expr ';' 	{$$=new FDeclNode(yylineno, *$2, $5, *$3, $8);
 //																delete $2; delete $3; delete $5; delete $8;
@@ -152,14 +157,14 @@ decl:
 
 varlist:
 	type NAME											    {$$=new std::pair<Datatypes, std::vector<VarDeclaration>>();
-	                                                         (*$$).first = $1; VarDeclaration p; p.name = *$2; (*$$).second.push_back(p);
+	                                                         (*$$).first = $1; VarDeclaration p; p.name = *$2; p.init = nullptr; (*$$).second.push_back(p);
 //															delete $2;
 															}
     | type NAME SET expr									{$$=new std::pair<Datatypes, std::vector<VarDeclaration>>();
                                                              (*$$).first = $1; VarDeclaration p; p.name = *$2; p.init = $4; (*$$).second.push_back(p);
 //															delete $2; delete $4;
 															}
-    | varlist ',' NAME										{VarDeclaration p; p.name = *$3; (*$1).second.push_back(p); $$=$1;
+    | varlist ',' NAME										{VarDeclaration p; p.name = *$3; p.init = nullptr; (*$1).second.push_back(p); $$=$1;
 //															delete $1; delete $3;
 															}
 	| varlist ',' NAME SET expr						        {VarDeclaration p; p.name = *$3; p.init = $5; (*$1).second.push_back(p); $$=$1;
@@ -224,13 +229,17 @@ expr:
 															}
 	| expr NAND expr								    	{$$=new NandNode(yylineno, $1, $3);
 //															delete $1; delete $3;
-															}
-	| expr '|' expr SMALLER							    	{$$=new SmallerNode(yylineno, $1, $3);
+                                                            }
+    | expr F_SMALLER expr                                   {$$ = new SmallerNode(yylineno, $1, $3, true);}
+    | expr S_SMALLER expr                                   {$$ = new SmallerNode(yylineno, $1, $3, false);}
+    | expr F_LARGER expr                                    {$$ = new LargerNode(yylineno, $1, $3, true);}
+    | expr S_LARGER expr                                    {$$ = new LargerNode(yylineno, $1, $3, false);}
+//	| expr '|' expr SMALLER							    	{$$=new SmallerNode(yylineno, $1, $3);
 //															delete $1; delete $3;
-															}
-    | expr '|' expr LARGER   							    {$$=new LargerNode(yylineno, $1, $3);
+//															}
+//    | expr '|' expr LARGER   							    {$$=new LargerNode(yylineno, $1, $3);
 //															delete $1; delete $3;
-															}
+//															}
 	| '(' expr ')'									    	{$$=$2;}
 	| SIZEOF '(' type ')'   						    	{$$=new SizeofNode(yylineno, $3);}
 	| SIZEOF '(' NAME ')'                                   {$$=new SizeofNode(yylineno, *$3);
@@ -288,14 +297,14 @@ void yyerror(char const *s) {
 
 
 int main() {
-//	yydebug = 1;
+	yydebug = 1;
     yyin = fopen("code.txt", "r");
     yyparse();
     fclose(yyin);
-    std::cout << "parse complete" << std::endl;
-    if (!root)
-        std::cout << "error" << std::endl;
-    std::cout << dynamic_cast<StatementList*>(root)->vec.size() << std::endl;
+//    std::cout << "parse complete" << std::endl;
+//    if (!root)
+//        std::cout << "error" << std::endl;
+//    std::cout << dynamic_cast<StatementList*>(root)->vec.size() << std::endl;
 	init(new Memory(), root);
     return 0;
 }
